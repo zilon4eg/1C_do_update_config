@@ -44,39 +44,24 @@ def copy_nethasp_ini(pc_name):
     # копируем файл
     try:
         shutil.copyfile(f'{path_copy}\\{file_name}', f'{path_paste}\\{file_name}')
-        print(f'{" " * indent_size}Файл "{file_name}" успешно скопирован')
+        print(f'Файл "{file_name}" успешно скопирован')
     except Exception as err:
         error = str(err).replace('\\\\', '\\').replace("'", '"')
         print(f'{" " * indent_size}{error}')
 
 
-def copy_1cestart_cfg(pc_name):
-    file_name = r'1cestart.cfg'
-    path_copy = r'\\fs\SHARE\Documents\PUBLIC\Soft\1C\config\1CEStart'
-    path_users_dir = f'\\\\{pc_name}\\C$\\Users'
-    for user_dir in list(dir_name for dir_name in os.listdir(path_users_dir) if dir_name not in ['AMS User', 'Default', 'docflow', 'Public', 'All Users', 'Default User', 'Администратор', 'Все пользователи'] and not os.path.isfile(f'{path_users_dir}\\{dir_name}')):
-        print(f'Профиль пользователя: {user_dir}')
-        path_paste = f'{path_users_dir}\\{user_dir}\\AppData\\Roaming\\1C\\1CEStart'
-        path_check_create(path_paste)
-        try:
-            shutil.copyfile(f'{path_copy}\\{file_name}', f'{path_paste}\\{file_name}')
-            print(f'{" " * indent_size}Файл "{file_name}" для "{user_dir}" успешно скопирован')
-        except Exception as err:
-            error = str(err).replace('\\\\', '\\').replace("'", '"')
-            print(f'{" " * indent_size}{error}')
+def body():
+    markup = f'=({pc_number:0{len(str(len(pc_name_list)))}})=({pc_name})'
+    markup = f'{markup}{"=" * (40 - len(markup))}'
+    print(markup)
+    print('Копируем файл конфигурации nethasp.ini')
+    copy_nethasp_ini(pc_name)
+
 
 if __name__ == '__main__':
     indent_size = 2
 
     pc_name_list = get_pc_name_list()
-    # pc_name_list = ['SKA-SUHORUKOV']  # заглушка
 
     for pc_number, pc_name in enumerate(pc_name_list, 1):
-        markup = f'=({pc_number:0{len(str(len(pc_name_list)))}})=({pc_name})'
-        markup = f'{markup}{"=" * (40 - len(markup))}'
-        print(markup)
-        print('Копируем файл конфигурации nethasp.ini')
-        copy_nethasp_ini(pc_name)
-        print(f'{"-" * 40}')
-        print('Копируем файл конфигурации 1cestart.cfg')
-        copy_1cestart_cfg(pc_name)
+        Thread(target=body).start()

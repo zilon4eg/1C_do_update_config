@@ -1,12 +1,19 @@
-import subprocess, platform
+import subprocess
+from pprint import pprint
 
 
-def pingOk(host):
-    try:
-        output = subprocess.check_output("ping -{} 1 {}".format('n' if platform.system().lower()=="windows" else 'c', host), shell=True)
-        print(output)
-    except Exception:
-        return False
-    return True
+try:
+    cmd_line = "ping SKA-TESTING"
+    p = subprocess.Popen(cmd_line, shell=True, stdout=subprocess.PIPE)
 
-print(pingOk('SKA-TESTING'))
+    # response = ''
+    # for line_data in p.stdout:
+    response = [line_data.decode("cp866", "ignore").rstrip() for line_data in p.stdout]
+    pprint(response)
+    # p.wait()
+    # print(p.returncode)  # =1 если  сайт не существует.   0 - если все в порядке.
+
+except subprocess.CalledProcessError as e:
+    print(e)
+except FileNotFoundError as e:
+    print(e)
