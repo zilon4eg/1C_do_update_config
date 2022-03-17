@@ -82,7 +82,7 @@ def copy_1cestart_cfg(hostname):
     except Exception as err:
         user_dirs = False
         error = str(err).replace("'", '"')
-        return {'name': '1cestart.cfg', 'status': False, 'message': error}
+        return [{'name': '1cestart.cfg', 'status': False, 'message': error}]
 
     if user_dirs:
         result = []
@@ -95,7 +95,7 @@ def copy_1cestart_cfg(hostname):
             except Exception as err:
                 error = str(err).replace("'", '"')
                 result.append({'name': '1cestart.cfg', 'status': False, 'message': f'{user_dir} - {error}'})
-        return result
+        return result if type(result) is list else [result]
 
 
 def body(hostname):
@@ -105,11 +105,13 @@ def body(hostname):
     local_output.append(ping_resp)
     if ping_resp['status']:
         local_output.append(copy_nethasp_ini(hostname))
-        [local_output.append(message) for message in copy_1cestart_cfg(hostname)]
+        copy_1cestart_cfg_output = copy_1cestart_cfg(hostname)
+        [local_output.append(message) for message in copy_1cestart_cfg_output]
     output.append(local_output)
 
 
 def print_data(data):
+    data = sorted(data, key=lambda x: x[0]['hostname'])
     for host in data:
         for count, line in enumerate(host, 1):
             if count == 1:
@@ -123,7 +125,7 @@ def print_data(data):
 if __name__ == '__main__':
     output = []
     hostname_list = get_hostname_list()
-    hostname_list = ['SKA-SUHORUKOV', 'SKA-TESTING', 'SKA-BUH']  # заглушка
+    # hostname_list = ['ska-troyanok']  # заглушка
 
     for pc_number, hostname in enumerate(hostname_list, 1):
         Thread(target=body, args=(hostname, )).start()
@@ -132,7 +134,6 @@ if __name__ == '__main__':
         if len(output) == len(hostname_list):
             complete = []
             error = []
-            # pprint(output)
 
             for host in output:
                 # msg_list = list(list(dictionary.values()) for dictionary in msg)
@@ -145,8 +146,8 @@ if __name__ == '__main__':
                 else:
                     complete.append(host)
 
-            print('======== COMPLETE ========')
+            print('========= COMPLETE =========')
             print_data(complete)
-            print('======== ERROR ========')
+            print('========== ERROR ==========')
             print_data(error)
             break
