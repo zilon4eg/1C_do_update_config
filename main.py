@@ -125,7 +125,7 @@ def print_data(data):
 if __name__ == '__main__':
     output = []
     hostname_list = get_hostname_list()
-    # hostname_list = ['ska-troyanok']  # заглушка
+    # hostname_list = ['ska-suhorukov']  # заглушка
 
     for pc_number, hostname in enumerate(hostname_list, 1):
         Thread(target=body, args=(hostname, )).start()
